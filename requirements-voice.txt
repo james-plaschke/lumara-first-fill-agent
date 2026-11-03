@@ -1,0 +1,4 @@
+-r requirements.txt
+requests>=2.25
+numpy>=1.20
+sounddevice>=0.4

@@ -1,0 +1,12 @@
+patient_code,stage,detail,pharmacy
+P-1001,approved_awaiting_patient_contact,Prior authorization approved. Pharmacy called twice and could not reach the patient to schedule delivery.,Northline Specialty Pharmacy
+P-1002,approved_patient_declined,Prior authorization approved. Patient declined to schedule delivery and said the cost was too high.,Northline Specialty Pharmacy
+P-1003,approved_awaiting_patient_contact,Prior authorization approved. Pharmacy could not reach the patient.,Northline Specialty Pharmacy
+P-1004,shipped,Shipped. Delivery expected in 2 business days. Injection training not yet scheduled.,Northline Specialty Pharmacy
+P-1005,prior_auth_pending,Insurer requested additional clinical notes from the prescriber's office.,Northline Specialty Pharmacy
+P-1006,prior_auth_denied,Prior authorization denied. Prescriber's office is filing an appeal.,Northline Specialty Pharmacy
+P-1007,on_therapy,First shipment delivered 2026-10-09. Refill scheduled.,Northline Specialty Pharmacy
+P-1008,approved_patient_postponed,Prior authorization approved. Patient asked the pharmacy to hold delivery and said he wants to wait.,Northline Specialty Pharmacy
+P-1010,approved_awaiting_patient_contact,Prior authorization approved. Pharmacy could not reach the patient.,Northline Specialty Pharmacy
+P-1011,approved_awaiting_patient_contact,Prior authorization approved. Pharmacy could not reach the patient to schedule delivery.,Northline Specialty Pharmacy
+P-1012,approved_benefits_reverification,Patient's insurance changed on 2026-10-01. Pharmacy needs a new benefits verification before it can ship.,Northline Specialty Pharmacy

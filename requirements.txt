@@ -1,0 +1,3 @@
+anthropic>=0.100,<3  # tested on 0.125 (Python 3.9) and 2.3 (Python 3.12)
+python-dotenv>=1.0
+pytest>=6

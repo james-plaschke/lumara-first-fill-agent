@@ -1,0 +1,8 @@
+.env
+.venv/
+__pycache__/
+logs/
+.pytest_cache/
+data/calder.db
+.DS_Store
+eval_results.md

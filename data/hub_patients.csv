@@ -1,0 +1,13 @@
+patient_code,first_name,dob,timezone,preferred_language,consent_automated_outreach,copay_card_status,prescriber_office
+P-1001,Maria,1988-03-14,America/New_York,en,1,not_enrolled,Harbor GI Associates
+P-1002,James,1979-11-02,America/Chicago,en,1,enrolled_not_activated,Lakeshore Digestive Health
+P-1003,Dana,1990-07-21,America/Los_Angeles,en,0,not_enrolled,Pacific Gastroenterology
+P-1004,Lucía,1972-05-30,America/Phoenix,es,1,active,Desert Valley GI
+P-1005,Robert,1965-01-09,America/New_York,en,1,not_enrolled,Harbor GI Associates
+P-1006,Aisha,1983-08-17,America/Detroit,en,1,not_enrolled,Great Lakes Gastro
+P-1007,Tom,1958-12-03,America/Denver,en,1,active,Front Range GI
+P-1008,Kenji,1995-04-25,America/Los_Angeles,en,1,active,Pacific Gastroenterology
+P-1009,Grace,1970-10-11,America/New_York,en,1,active,Harbor GI Associates
+P-1010,Carlos,1986-02-14,America/Chicago,es,0,active,Lakeshore Digestive Health
+P-1011,Leilani,1992-06-08,Pacific/Honolulu,en,1,active,Island Digestive Care
+P-1012,Marcus,1977-09-29,America/New_York,en,1,active,Harbor GI Associates
