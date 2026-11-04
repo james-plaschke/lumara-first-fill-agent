@@ -153,6 +153,27 @@ def test_classifier_failure_fails_closed(monkeypatch):
     assert db.read_table("safety_flags")
 
 
+def test_urgent_keyword_survives_classifier_failure(monkeypatch):
+    # Found in code review (Nov 4): a classifier error threw away the keyword hits, so
+    # "chest pain" during an outage got the 24-hour nurse script instead of 911.
+    def boom(text, agent_asked=""):
+        raise TimeoutError("classifier timed out")
+    monkeypatch.setattr(agent, "classify_message", boom)
+    result = agent.handle_turn(new_session(), "I'm having chest pain right now")
+    assert result.ended and result.reply == agent.SCRIPTS["urgent"]["en"]
+    assert db.read_table("safety_flags")[0]["kind"] == "urgent_adverse_event"
+
+
+def test_language_holds_when_classifier_fails(monkeypatch):
+    def boom(text, agent_asked=""):
+        raise TimeoutError("classifier timed out")
+    monkeypatch.setattr(agent, "classify_message", boom)
+    session = new_session()
+    session.language = "es"
+    result = agent.handle_turn(session, "tengo dolor de pecho")
+    assert result.ended and result.reply == agent.SCRIPTS["urgent"]["es"]
+
+
 def test_flag_record_has_four_minimum_elements(monkeypatch):
     monkeypatch.setattr(agent, "classify_message", lambda text, agent_asked="": NO_AE)
     agent.handle_turn(new_session(), "I have a fever")

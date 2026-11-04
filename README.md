@@ -107,7 +107,7 @@ patient says something
 | `chat.py` | Terminal front end: talk to the agent, or print the call list |
 | `db.py` | The data layer: builds the database from the CSVs, and every read and write the agent does |
 | `data/` | The fake hub extract and pharmacy daily file |
-| `tests/test_gates.py` | 48 deterministic tests of the gates, with the classifier stubbed and a fresh database per test |
+| `tests/test_gates.py` | 50 deterministic tests of the gates, with the classifier stubbed and a fresh database per test |
 | `run_conversations.py` | Scripted patient lines against the live agent; writes `transcripts.md` |
 | `voice.py` | Optional voice front end on the same `handle_turn` |
 | `eval_text.py` | Accuracy eval: trap questions, each reply checked by pattern rules and a separate judge model |
@@ -153,7 +153,7 @@ Design choices worth calling out:
 
 ## Test results
 
-See [`transcripts.md`](transcripts.md) for the full conversations. Patient lines are scripted; everything the agent says is live model output. Plus 48 deterministic gate tests (`pytest -q`).
+See [`transcripts.md`](transcripts.md) for the full conversations. Patient lines are scripted; everything the agent says is live model output. Plus 50 deterministic gate tests (`pytest -q`).
 
 | # | Conversation | Result |
 |---|---|---|
@@ -180,8 +180,9 @@ See [`transcripts.md`](transcripts.md) for the full conversations. Patient lines
 6. **It made up a delivery date.** In a Spanish test call it turned "2 business days" into "around Wednesday, November 4", then corrected itself a turn later. That's the kind of confident, small fabrication no keyword list catches, so I built an eval for it (below).
 7. **An opt-out could swallow a side effect.** Found while reviewing the turn flow the night before submitting: the "stop calling me" check ran first and ended the call before the safety screen, so "I had a rash, just stop calling me" was opted out and the rash was never reported. Fix: the screen now runs on every message first; the opt-out is still recorded, and a side effect in the same message still gets its safety record and nurse callback (a person, not this agent). Checked live in English and Spanish, and a regression test locks it in.
 8. **A birthday ended the call.** Recording the demo video, I typed my test birthday as "nov 2 79" and the classifier scored it 0.5 for a side effect, so the call ended with a nurse callback. It was judging the message with no idea the agent had just asked for a date of birth. Fix: the classifier now also sees the agent's last line, as context only, and is told to judge only the patient's words. Rechecked 12 messages with and without context: "nov 2 79" and "11/2/79" now pass (0.02), while real side effects, a vague one ("my skin's been acting kind of weird"), Spanish, and an accidental double dose still flag. A test checks the context is passed.
+9. **A classifier outage downgraded an emergency.** Found in code review at the onsite (Nov 4): if the classifier call failed, the whole screen result was thrown away, keyword hits included, and the turn was treated as an ordinary side effect. So "I'm having chest pain" during an outage got the 24-hour nurse script instead of "call 911." Fix: the screen keeps its keyword results when the classifier fails, so an urgent keyword still plays the emergency script, and everything else still fails closed to a nurse callback. The language stays whatever it was on the last turn. Two tests cover it, in English and Spanish, and both fail on the old code.
 
-The accuracy eval below ran before fixes 7 and 8. Fix 7 only changes messages with an opt-out phrase, and the eval has none. Fix 8 changes the side-effect screen's input; the spot checks above came out the same or better, but I haven't rerun the full eval on it.
+The accuracy eval below ran before fixes 7, 8 and 9. Fix 9 only changes what happens when the classifier call fails, which the eval never triggers. Fix 7 only changes messages with an opt-out phrase, and the eval has none. Fix 8 changes the side-effect screen's input; the spot checks above came out the same or better, but I haven't rerun the full eval on it.
 
 ## Accuracy eval
 
@@ -201,7 +202,7 @@ The accuracy eval below ran before fixes 7 and 8. Fix 7 only changes messages wi
 | 1 | 55/99 | Baseline. About half the failures were the eval's fault: the judge hadn't been shown the agent's instructions, so it failed replies for saying "Lumara" |
 | 2 | 90/99 | Judge sees the agent's instructions. Agent: one language per reply, no comments on how old the data is, describe teams only by what they help with, never offer to contact anyone but the patient |
 | 3 | 96/99 | Reply language enforced in code. Classifier no longer treats other medicines failing as a Lumara event. If someone else answers, offer a callback for the patient |
-| 4 (before fixes 7 and 8 below) | 98/99 | Rerun after adding the outbound rewrite, the callback cap, and failing closed on cut-off replies |
+| 4 (before fixes 7, 8 and 9 below) | 98/99 | Rerun after adding the outbound rewrite, the callback cap, and failing closed on cut-off replies |
 
 Real defects the eval found and fixed: English and Spanish mixed in one reply ("Es una pregunta muy razonable, y I'm sorry..."), telling patients "the update is a day old" (my own prompt's reasoning, repeated as fact), promising what other teams would do, offering to "reach out" to a family member with no consent on file, and ending the call when a patient said other medicines hadn't worked for them.
 

@@ -192,7 +192,13 @@ def screen_inbound(text: str, agent_asked: str = "") -> dict:
     the classifier catches paraphrase and Spanish. Either one alone is enough."""
     urgent_hits = find_terms(text, URGENT_TERMS)
     ae_hits = find_terms(text, AE_TERMS)
-    verdict = classify_message(text, agent_asked)  # an exception here is handled by the caller as fail-closed
+    try:
+        verdict = classify_message(text, agent_asked)
+    except Exception as e:
+        # Fail closed, but keep what the keywords found: "heart attack" during an outage
+        # still gets the 911 script, not the 24-hour nurse one. Language stays as it was.
+        return {"urgent": bool(urgent_hits), "adverse_event": True,
+                "keyword_hits": urgent_hits + ae_hits, "error": f"{type(e).__name__}: {e}"}
 
     maybe = verdict["ae_probability"] >= AE_ESCALATE_AT  # a "no" that isn't a confident no
     return {
@@ -303,7 +309,7 @@ def handle_turn(session: Session, patient_text: str) -> TurnResult:
                         if m["role"] == "assistant" and isinstance(m["content"], str)), "")
     try:
         screen = screen_inbound(patient_text, agent_asked)
-        session.language = screen["language"]
+        session.language = screen.get("language", session.language)
     except Exception as e:
         screen = {"urgent": False, "adverse_event": True, "error": f"{type(e).__name__}: {e}"}
     events.append({"inbound_screen": screen})
